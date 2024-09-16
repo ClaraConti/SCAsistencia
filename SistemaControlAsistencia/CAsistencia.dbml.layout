@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="CAsistencia">
+  <DataContextMoniker Name="/CAsistenciaDataContext" />
+  <nestedChildShapes>
+    <classShape Id="fc001835-0cbe-4279-8015-b1ae32c95a3d" absoluteBounds="3.5, 1.125, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/CAsistenciaDataContext/TAlumno" />
+      <nestedChildShapes>
+        <elementListCompartment Id="5f873a16-06f8-4ccf-acb9-857226984b31" absoluteBounds="3.515, 1.585, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="620a93f3-edbc-4aba-bcde-d0d42d7948c0" absoluteBounds="6.25, 1.125, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/CAsistenciaDataContext/TAsistencia" />
+      <nestedChildShapes>
+        <elementListCompartment Id="391bd16d-0047-4aa0-907e-9d89fc3e4db6" absoluteBounds="6.265, 1.585, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="e9885136-a006-4a79-8fb1-99c4b66d37a6" absoluteBounds="3.5, 3.5, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/CAsistenciaDataContext/TAuxiliar" />
+      <nestedChildShapes>
+        <elementListCompartment Id="7f6c0b73-6898-460a-9a96-e10e7b543517" absoluteBounds="3.515, 3.96, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="8d4ca2f8-1b9c-49d1-8ca8-622a8a5ded3b" absoluteBounds="3.5, 5.75, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/CAsistenciaDataContext/TDocente" />
+      <nestedChildShapes>
+        <elementListCompartment Id="bbfeaba1-fba3-4e34-82b3-e2d998ef6b1e" absoluteBounds="3.515, 6.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="636f13fd-f2e4-4d8f-87b7-9ead43eada72" absoluteBounds="0.75, 3.625, 2, 1.1939925130208331">
+      <DataClassMoniker Name="/CAsistenciaDataContext/TUsuario" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1f0b9958-67c6-42e6-9dfa-dd022a6bf303" absoluteBounds="0.765, 4.085, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(5.5 : 1.91429768880208); (6.25 : 1.91429768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CAsistenciaDataContext/TAlumno/TAlumno_TAsistencia" />
+      <nodes>
+        <classShapeMoniker Id="fc001835-0cbe-4279-8015-b1ae32c95a3d" />
+        <classShapeMoniker Id="620a93f3-edbc-4aba-bcde-d0d42d7948c0" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(1.75 : 3.625); (1.75 : 1.91429768880208); (3.5 : 1.91429768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CAsistenciaDataContext/TUsuario/TUsuario_TAlumno" />
+      <nodes>
+        <classShapeMoniker Id="636f13fd-f2e4-4d8f-87b7-9ead43eada72" />
+        <classShapeMoniker Id="fc001835-0cbe-4279-8015-b1ae32c95a3d" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 4.22199625651042); (3.5 : 4.22199625651042)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CAsistenciaDataContext/TUsuario/TUsuario_TAuxiliar" />
+      <nodes>
+        <classShapeMoniker Id="636f13fd-f2e4-4d8f-87b7-9ead43eada72" />
+        <classShapeMoniker Id="e9885136-a006-4a79-8fb1-99c4b66d37a6" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(1.75 : 4.81899251302083); (1.75 : 6.53929768880208); (3.5 : 6.53929768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CAsistenciaDataContext/TUsuario/TUsuario_TDocente" />
+      <nodes>
+        <classShapeMoniker Id="636f13fd-f2e4-4d8f-87b7-9ead43eada72" />
+        <classShapeMoniker Id="8d4ca2f8-1b9c-49d1-8ca8-622a8a5ded3b" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>
