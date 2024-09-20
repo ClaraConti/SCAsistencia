@@ -8,8 +8,7 @@ namespace SistemaControlAsistencia
 {
     public partial class frmLogin : Page
     {
-        private static string cadena = ConfigurationManager.ConnectionStrings["BDControlAsistenciaConnectionString"].ConnectionString;
-
+        private static string cadena = ConfigurationManager.ConnectionStrings["cadena"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
         {
         }
