@@ -156,7 +156,7 @@ namespace SistemaControlAsistencia
                         ddlDocente.SelectedValue = asignatura.IdDocente.ToString();
 
                         ViewState["IdAsignatura"] = asignatura.IdAsignatura;
-                        btnActualizar.Visible = true; // Asegúrate de que el botón se muestre
+                        btnActualizar.Visible = true; 
                     }
                 }
 
