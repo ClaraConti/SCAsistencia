@@ -14,7 +14,7 @@ namespace SistemaControlAsistencia
         {
             if (!IsPostBack)
             {
-               
+                
                 if (Session["TipoUsuario"] != null && Session["TipoUsuario"].ToString() == "Administrador")
                 {
                     lblAdministrador.Text = $"Bienvenido Admin: {Session["CodUsuario"]}";
@@ -28,7 +28,7 @@ namespace SistemaControlAsistencia
 
         protected void btnCerrar_Click(object sender, EventArgs e)
         {
-           
+            
             Session.Remove("TipoUsuario");
             Session.Remove("CodUsuario");
             Response.Redirect("frmLogin.aspx");
@@ -52,6 +52,16 @@ namespace SistemaControlAsistencia
         protected void btnCrudAsistencia_Click(object sender, EventArgs e)
         {
             Response.Redirect("frmAsistencia.aspx");
+        }
+
+        protected void btnCrudUsuario_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("frmUsuario.aspx");
+        }
+
+        protected void btnCrudAsignatura_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("frmAsignatura.aspx");
         }
     }
 }

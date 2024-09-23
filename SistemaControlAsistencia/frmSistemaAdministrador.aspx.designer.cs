@@ -60,6 +60,15 @@ namespace SistemaControlAsistencia
         protected global::System.Web.UI.WebControls.Button btnCrudDocente;
 
         /// <summary>
+        /// Control btnCrudAsignatura.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCrudAsignatura;
+
+        /// <summary>
         /// Control btnCrudAsistencia.
         /// </summary>
         /// <remarks>
@@ -67,5 +76,14 @@ namespace SistemaControlAsistencia
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnCrudAsistencia;
+
+        /// <summary>
+        /// Control btnCrudUsuario.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCrudUsuario;
     }
 }

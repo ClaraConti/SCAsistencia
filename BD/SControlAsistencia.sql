@@ -5,14 +5,11 @@ BEGIN
 END
 GO
 
-
 CREATE DATABASE BDControlAsistencia;
 GO
 
-
 USE BDControlAsistencia;
 GO
-
 
 IF OBJECT_ID('TUsuario') IS NULL
 BEGIN
@@ -39,7 +36,6 @@ BEGIN
 END
 GO
 
-
 IF OBJECT_ID('TAuxiliar') IS NULL
 BEGIN
     CREATE TABLE TAuxiliar (
@@ -51,7 +47,6 @@ BEGIN
     );
 END
 GO
-
 
 IF OBJECT_ID('TDocente') IS NULL
 BEGIN
@@ -65,69 +60,95 @@ BEGIN
 END
 GO
 
-
-IF OBJECT_ID('TAsistencia') IS NULL
-BEGIN
-    CREATE TABLE TAsistencia (
-        IdAsistencia INT PRIMARY KEY IDENTITY(1,1),
-        IdAlumno INT NOT NULL,
-        Fecha DATE NOT NULL,
-        Estado VARCHAR(20) NOT NULL, -- Ej. 'Presente', 'Ausente'
-        FOREIGN KEY (IdAlumno) REFERENCES TAlumno(IdAlumno)
-    );
-END
-GO
-
-
-IF OBJECT_ID('TAsignatura') IS NULL
+IF OBJECT_ID('TAsignatura') IS NULL 
 BEGIN
     CREATE TABLE TAsignatura (
         IdAsignatura INT PRIMARY KEY IDENTITY(1,1),
         NombreAsignatura VARCHAR(100) NOT NULL,
-		DescripcionAsignatura VARCHAR(100) NOT NULL,
+        Descripcion VARCHAR(100) NOT NULL,
+		Nivel VARCHAR(50) NOT NULL,
         IdDocente INT NOT NULL,
         FOREIGN KEY (IdDocente) REFERENCES TDocente(IdDocente)
     );
 END
 GO
 
+IF OBJECT_ID('TAsistencia') IS NULL
+BEGIN
+    CREATE TABLE TAsistencia (
+        IdAsistencia INT PRIMARY KEY IDENTITY(1,1),
+        IdAlumno INT NOT NULL,
+        IdAsignatura INT NOT NULL, 
+        Fecha DATE NOT NULL,
+        Periodo VARCHAR(20),
+        Estado VARCHAR(20) NOT NULL, 
+        FOREIGN KEY (IdAlumno) REFERENCES TAlumno(IdAlumno),
+        FOREIGN KEY (IdAsignatura) REFERENCES TAsignatura(IdAsignatura) 
+    );
+END
+GO
+
+IF OBJECT_ID('TInscripcion') IS NULL
+BEGIN
+    CREATE TABLE TInscripcion (
+        IdInscripcion INT PRIMARY KEY IDENTITY(1,1),
+        IdAlumno INT NOT NULL,
+        IdAsignatura INT NOT NULL,
+        FOREIGN KEY (IdAlumno) REFERENCES TAlumno(IdAlumno),
+        FOREIGN KEY (IdAsignatura) REFERENCES TAsignatura(IdAsignatura)
+    );
+END
+GO
 
 INSERT INTO TUsuario (CodUsuario, Contrasena) VALUES 
 ('admin', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
-('juan.perez@example.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
-('maria.lopez@example.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
-('pedro.ramirez@example.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
-('alumno1@example.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
-('auxiliar1@example.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
-('docente1@example.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
-('docente2@example.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234'));
+('juan.perez@gmail.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
+('maria.lopez@gmail.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
+('pedro.ramirez@gmail.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
+('alumno1@gmail.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
+('alumno2@gmail.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
+('auxiliar1@gmail.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
+('docente1@gmail.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234')),
+('docente2@gmail.com', ENCRYPTBYPASSPHRASE('miFraseDeContraseña', '1234'));
 GO
 
 
 INSERT INTO TAlumno (Nombre, Telefono, CodUsuario, CursoGrado, Nivel, Direccion) VALUES 
-('Juan Pérez', '123456789', 'alumno1@example.com', '1', 'Primaria', 'Av. Pasaje');
-GO
+('Juan Pérez', '123456789', 'alumno1@gmail.com', '1', 'Primaria', 'Av. Pasaje'),
+('Ana Gómez', '987654321', 'alumno2@gmail.com', '2', 'Primaria', 'Calle Falsa');
 
 
 INSERT INTO TAuxiliar (Nombre, Telefono, CodUsuario) VALUES 
-('Ana López', '987654321', 'auxiliar1@example.com');
+('Ana López', '987654321', 'auxiliar1@gmail.com');
 GO
 
 INSERT INTO TDocente (Nombre, Telefono, CodUsuario) VALUES 
-('Pedro Ramírez', '555444333', 'docente1@example.com');
+('Pedro Ramírez', '555444333', 'docente1@gmail.com'),
+('María López', '444555666', 'docente2@gmail.com');
+
+
+
+INSERT INTO TAsignatura (NombreAsignatura, Descripcion, Nivel, IdDocente) VALUES 
+('Matemáticas', 'Matemáticas Básicas', 'Primaria', 1),
+('Ciencias', 'Ciencias Naturales', 'Primaria', 1),
+('Lengua', 'Lengua y Literatura', 'Secundaria', 2),
+('Historia', 'Historia General', 'Secundaria', 2),  
+('Física', 'Física Básica', 'Secundaria', 1);      
 GO
 
 
-INSERT INTO TAsistencia (IdAlumno, Fecha, Estado) VALUES 
-(1, '2024-09-01', 'Presente'),
-(1, '2024-09-02', 'Ausente');
-GO
+INSERT INTO TInscripcion (IdAlumno, IdAsignatura) VALUES 
+(1, 1), 
+(1, 2), 
+(2, 1), 
+(2, 3); 
 
 
-INSERT INTO TAsignatura (NombreAsignatura,DescripcionAsignatura, IdDocente) VALUES 
-('Matemáticas', 'eeee',1),
-('Lengua','eee', 1);
-GO
+INSERT INTO TAsistencia (IdAlumno, IdAsignatura, Fecha, Estado) VALUES 
+(1, 1, '2024-09-01', 'Presente'), 
+(1, 2, '2024-09-02', 'Ausente'), 
+(2, 1, '2024-09-01', 'Presente'), 
+(2, 3, '2024-09-02', 'Presente');
 
 
 SELECT * FROM TDocente;
@@ -136,8 +157,12 @@ SELECT * FROM TAlumno;
 SELECT * FROM TAuxiliar;
 SELECT * FROM TAsistencia;
 SELECT * FROM TAsignatura;
+SELECT * FROM TInscripcion; 
 GO
 
+--******************************
+
+--********************************************--
 IF OBJECT_ID('spLogin') IS NOT NULL
 BEGIN
     DROP PROCEDURE spLogin;
@@ -152,15 +177,15 @@ BEGIN
     DECLARE @ContrasenaEncriptada VARBINARY(8000);
     DECLARE @ContrasenaDesencriptada VARCHAR(50);
 
-    -- Obtener la contraseña encriptada de la base de datos
+   
     SELECT @ContrasenaEncriptada = Contrasena
     FROM TUsuario
     WHERE CodUsuario = @CodUsuario;
 
-    -- Desencriptar la contraseña almacenada
+    
     SET @ContrasenaDesencriptada = CONVERT(VARCHAR(50), DECRYPTBYPASSPHRASE('miFraseDeContraseña', @ContrasenaEncriptada));
 
-    -- Comparar la contraseña desencriptada con la proporcionada
+    
     IF @ContrasenaDesencriptada = @Contrasena
     BEGIN
 	
@@ -218,3 +243,32 @@ BEGIN
     END
 END
 GO
+--******************
+SELECT A.Nombre AS Alumno, Asig.NombreAsignatura, T.Fecha, T.Estado 
+FROM TAsistencia T
+JOIN TAlumno A ON T.IdAlumno = A.IdAlumno
+JOIN TInscripcion I ON A.IdAlumno = I.IdAlumno
+JOIN TAsignatura Asig ON I.IdAsignatura = Asig.IdAsignatura
+WHERE A.Nivel = 'Primaria' AND A.CursoGrado = '1' AND T.Fecha BETWEEN '2024-09-01' AND '2024-09-30';
+-------------------------------------------------------------------------
+--****************este de abajo es igual solo que cosider asigantura mas
+
+SELECT 
+    A.Nombre AS Alumno, 
+    A.CursoGrado AS Grado,
+    Asig.NombreAsignatura, 
+    T.Fecha, 
+    T.Estado
+FROM 
+    TAsistencia T
+JOIN 
+    TAlumno A ON T.IdAlumno = A.IdAlumno
+JOIN 
+    TInscripcion I ON A.IdAlumno = I.IdAlumno
+JOIN 
+    TAsignatura Asig ON I.IdAsignatura = Asig.IdAsignatura
+WHERE 
+    A.Nivel = 'Primaria' 
+    AND A.CursoGrado = '1' 
+    AND T.Fecha BETWEEN '2024-09-01' AND '2024-09-30'
+    AND Asig.NombreAsignatura = 'Ciencias';  -- Reemplaza con la asignatura específica

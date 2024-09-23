@@ -11,6 +11,8 @@
         <asp:Button runat="server" ID="btnCrudAlumno" Text="CRUD Alumno" OnClick="btnCrudAlumno_Click" CssClass="btn btn-primary" />
         <asp:Button runat="server" ID="btnCrudAuxiliar" Text="CRUD Auxiliar" OnClick="btnCrudAuxiliar_Click" CssClass="btn btn-secondary" />
         <asp:Button runat="server" ID="btnCrudDocente" Text="CRUD Docente" OnClick="btnCrudDocente_Click" CssClass="btn btn-success" />
+        <asp:Button runat="server" ID="btnCrudAsignatura" Text="CRUD Asignatura" OnClick="btnCrudAsignatura_Click" CssClass="btn btn-success" />
         <asp:Button runat="server" ID="btnCrudAsistencia" Text="CRUD Asistencia" OnClick="btnCrudAsistencia_Click" CssClass="btn btn-warning" />
+        <asp:Button runat="server" ID="btnCrudUsuario" Text="CRUD Usuario" OnClick="btnCrudUsuario_Click" CssClass="btn btn-warning" />
     </div>
 </asp:Content>
