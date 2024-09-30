@@ -14,103 +14,80 @@ namespace SistemaControlAsistencia
         {
             if (!IsPostBack)
             {
-                CargarNiveles();
+                CargarCursos();
             }
         }
 
-        private void CargarNiveles()
+        private void CargarCursos()
         {
-            ddlNivel.Items.Clear();
-            ddlNivel.Items.Add(new ListItem("Seleccionar Nivel", ""));
-            ddlNivel.Items.Add(new ListItem("Primaria", "Primaria"));
-            ddlNivel.Items.Add(new ListItem("Secundaria", "Secundaria"));
+            var cursos = asistencia.TCurso.Select(c => new { c.IdCurso, c.NombreCurso }).ToList();
+            ddlCurso.DataSource = cursos;
+            ddlCurso.DataTextField = "NombreCurso";
+            ddlCurso.DataValueField = "IdCurso";
+            ddlCurso.DataBind();
+            ddlCurso.Items.Insert(0, new ListItem("Seleccionar Curso", ""));
         }
 
-        protected void ddlNivel_SelectedIndexChanged(object sender, EventArgs e)
+        protected void ddlCurso_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ddlGrado.Items.Clear();
-            ddlGrado.Items.Add(new ListItem("Seleccionar Grado", ""));
-            int maxGrado = ddlNivel.SelectedValue == "Primaria" ? 6 : 5;
-
-            for (int i = 1; i <= maxGrado; i++)
-            {
-                ddlGrado.Items.Add(new ListItem($"{i}er Grado", i.ToString()));
-            }
-
-            
-            CargarAsignaturas();
+            CargarAlumnosInscritos();
         }
 
-        private void CargarAsignaturas()
+        private void CargarAlumnosInscritos()
         {
-            ddlAsignatura.Items.Clear();
-            ddlAsignatura.Items.Add(new ListItem("Seleccionar Asignatura", ""));
-
-            string nivel = ddlNivel.SelectedValue; 
-
-            
-            if (!string.IsNullOrEmpty(nivel))
+            if (string.IsNullOrEmpty(ddlCurso.SelectedValue))
             {
-                var asignaturas = from a in asistencia.TAsignatura
-                                  where a.Nivel == nivel 
-                                  select a;
-
-                foreach (var asignatura in asignaturas)
-                {
-                    ddlAsignatura.Items.Add(new ListItem(asignatura.NombreAsignatura, asignatura.IdAsignatura.ToString()));
-                }
-            }
-        }
-
-
-        protected void btnGenerarReporte_Click(object sender, EventArgs e)
-        {
-            string nivel = ddlNivel.SelectedValue;
-            string grado = ddlGrado.SelectedValue;
-            string trimestre = ddlTrimestre.SelectedValue;
-            string asignaturaId = ddlAsignatura.SelectedValue;
-
-            if (string.IsNullOrEmpty(nivel) || string.IsNullOrEmpty(grado) || string.IsNullOrEmpty(trimestre) || string.IsNullOrEmpty(asignaturaId))
-            {
-                lblMensaje.Text = "Por favor, seleccione todos los campos para generar el reporte.";
+                gvAlumnosInscritos.DataSource = null;
+                gvAlumnosInscritos.DataBind();
                 return;
             }
 
-            var fechaInicio = "";
-            var fechaFin = "";
+            int idCurso = int.Parse(ddlCurso.SelectedValue);
 
-            switch (trimestre)
+            var alumnosInscritos = from a in asistencia.TAlumno
+                                   join ins in asistencia.TInscripcion on a.IdAlumno equals ins.IdAlumno
+                                   where ins.IdCurso == idCurso
+                                   select new
+                                   {
+                                       NombreAlumno = a.Nombre
+                                   };
+
+            gvAlumnosInscritos.DataSource = alumnosInscritos.ToList();
+            gvAlumnosInscritos.DataBind();
+        }
+
+        protected void btnGenerarReporte_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(ddlCurso.SelectedValue))
             {
-                case "1er Trimestre":
-                    fechaInicio = "2024-03-01";
-                    fechaFin = "2024-05-31";
-                    break;
-                case "2do Trimestre":
-                    fechaInicio = "2024-06-01";
-                    fechaFin = "2024-08-31";
-                    break;
-                case "3er Trimestre":
-                    fechaInicio = "2024-09-01";
-                    fechaFin = "2024-11-30";
-                    break;
+                lblMensaje.Text = "Por favor, seleccione un curso.";
+                return;
             }
 
-            var reporte = from A in asistencia.TAsistencia
-                          join Al in asistencia.TAlumno on A.IdAlumno equals Al.IdAlumno
-                          join I in asistencia.TInscripcion on A.IdAlumno equals I.IdAlumno
-                          join Asig in asistencia.TAsignatura on I.IdAsignatura equals Asig.IdAsignatura
-                          where Al.Nivel == nivel
-                                && Al.CursoGrado == grado
-                                && A.Fecha >= DateTime.Parse(fechaInicio)
-                                && A.Fecha <= DateTime.Parse(fechaFin)
-                                && Asig.IdAsignatura.ToString() == asignaturaId 
+            if (string.IsNullOrEmpty(ddlMes.SelectedValue))
+            {
+                lblMensaje.Text = "Por favor, seleccione un mes.";
+                return;
+            }
+
+            int idCurso = int.Parse(ddlCurso.SelectedValue);
+            int mesSeleccionado = int.Parse(ddlMes.SelectedValue);
+            int añoActual = DateTime.Now.Year;
+
+           
+            DateTime fechaInicio = new DateTime(añoActual, mesSeleccionado, 1);
+            DateTime fechaFin = fechaInicio.AddMonths(1).AddDays(-1); 
+
+            
+            var reporte = from a in asistencia.TAlumno
+                          join ins in asistencia.TInscripcion on a.IdAlumno equals ins.IdAlumno
+                          where ins.IdCurso == idCurso
                           select new
                           {
-                              NombreAlumno = Al.Nombre, 
-                              CursoGrado = Al.CursoGrado,
-                              Asignatura = Asig.NombreAsignatura,
-                              A.Fecha,
-                              A.Estado
+                              NombreAlumno = a.Nombre,
+                              Mes = fechaInicio.ToString("MMMM"),
+                              Presentes = asistencia.TAsistencia.Count(x => x.IdAlumno == a.IdAlumno && x.Fecha >= fechaInicio && x.Fecha <= fechaFin && x.Estado == "Presente"),
+                              Faltas = asistencia.TAsistencia.Count(x => x.IdAlumno == a.IdAlumno && x.Fecha >= fechaInicio && x.Fecha <= fechaFin && x.Estado == "Falta")
                           };
 
             if (reporte.Any())
@@ -123,11 +100,9 @@ namespace SistemaControlAsistencia
             {
                 gvReporteAsistencia.DataSource = null;
                 gvReporteAsistencia.DataBind();
-                lblMensaje.Text = "No se encontraron registros de asistencia para los filtros seleccionados.";
+                lblMensaje.Text = "No se encontraron registros de asistencia para el curso seleccionado en el mes indicado.";
             }
         }
-
-
 
     }
 }
