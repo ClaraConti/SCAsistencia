@@ -1,4 +1,6 @@
 
+--******************************************************
+
 IF DB_ID('BDControlAsistencia') IS NOT NULL
 BEGIN
     DROP DATABASE BDControlAsistencia;
@@ -60,11 +62,11 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('TAsignatura') IS NULL 
+IF OBJECT_ID('TCurso') IS NULL 
 BEGIN
-    CREATE TABLE TAsignatura (
-        IdAsignatura INT PRIMARY KEY IDENTITY(1,1),
-        NombreAsignatura VARCHAR(100) NOT NULL,
+    CREATE TABLE TCurso (
+        IdCurso INT PRIMARY KEY IDENTITY(1,1),
+        NombreCurso VARCHAR(100) NOT NULL,
         Descripcion VARCHAR(100) NOT NULL,
 		Nivel VARCHAR(50) NOT NULL,
         IdDocente INT NOT NULL,
@@ -78,12 +80,12 @@ BEGIN
     CREATE TABLE TAsistencia (
         IdAsistencia INT PRIMARY KEY IDENTITY(1,1),
         IdAlumno INT NOT NULL,
-        IdAsignatura INT NOT NULL, 
+        IdCurso INT NOT NULL, 
         Fecha DATE NOT NULL,
         Periodo VARCHAR(20),
         Estado VARCHAR(20) NOT NULL, 
         FOREIGN KEY (IdAlumno) REFERENCES TAlumno(IdAlumno),
-        FOREIGN KEY (IdAsignatura) REFERENCES TAsignatura(IdAsignatura) 
+        FOREIGN KEY (IdCurso) REFERENCES TCurso(IdCurso) 
     );
 END
 GO
@@ -93,9 +95,9 @@ BEGIN
     CREATE TABLE TInscripcion (
         IdInscripcion INT PRIMARY KEY IDENTITY(1,1),
         IdAlumno INT NOT NULL,
-        IdAsignatura INT NOT NULL,
+        IdCurso INT NOT NULL,
         FOREIGN KEY (IdAlumno) REFERENCES TAlumno(IdAlumno),
-        FOREIGN KEY (IdAsignatura) REFERENCES TAsignatura(IdAsignatura)
+        FOREIGN KEY (IdCurso) REFERENCES TCurso(IdCurso)
     );
 END
 GO
@@ -128,7 +130,7 @@ INSERT INTO TDocente (Nombre, Telefono, CodUsuario) VALUES
 
 
 
-INSERT INTO TAsignatura (NombreAsignatura, Descripcion, Nivel, IdDocente) VALUES 
+INSERT INTO TCurso (NombreCurso, Descripcion, Nivel, IdDocente) VALUES 
 ('Matemáticas', 'Matemáticas Básicas', 'Primaria', 1),
 ('Ciencias', 'Ciencias Naturales', 'Primaria', 1),
 ('Lengua', 'Lengua y Literatura', 'Secundaria', 2),
@@ -137,18 +139,19 @@ INSERT INTO TAsignatura (NombreAsignatura, Descripcion, Nivel, IdDocente) VALUES
 GO
 
 
-INSERT INTO TInscripcion (IdAlumno, IdAsignatura) VALUES 
+INSERT INTO TInscripcion (IdAlumno, IdCurso) VALUES 
 (1, 1), 
 (1, 2), 
 (2, 1), 
 (2, 3); 
 
 
-INSERT INTO TAsistencia (IdAlumno, IdAsignatura, Fecha, Estado) VALUES 
+INSERT INTO TAsistencia (IdAlumno, IdCurso, Fecha, Estado) VALUES 
 (1, 1, '2024-09-01', 'Presente'), 
-(1, 2, '2024-09-02', 'Ausente'), 
+(1, 2, '2024-09-02', 'Falta'), 
 (2, 1, '2024-09-01', 'Presente'), 
 (2, 3, '2024-09-02', 'Presente');
+
 
 
 SELECT * FROM TDocente;
@@ -156,119 +159,10 @@ SELECT * FROM TUsuario;
 SELECT * FROM TAlumno;
 SELECT * FROM TAuxiliar;
 SELECT * FROM TAsistencia;
-SELECT * FROM TAsignatura;
+SELECT * FROM TCurso;
 SELECT * FROM TInscripcion; 
 GO
 
 --******************************
 
 --********************************************--
-IF OBJECT_ID('spLogin') IS NOT NULL
-BEGIN
-    DROP PROCEDURE spLogin;
-END
-GO
-
-CREATE PROCEDURE spLogin
-    @CodUsuario VARCHAR(50),
-    @Contrasena VARCHAR(50)
-AS
-BEGIN
-    DECLARE @ContrasenaEncriptada VARBINARY(8000);
-    DECLARE @ContrasenaDesencriptada VARCHAR(50);
-
-   
-    SELECT @ContrasenaEncriptada = Contrasena
-    FROM TUsuario
-    WHERE CodUsuario = @CodUsuario;
-
-    
-    SET @ContrasenaDesencriptada = CONVERT(VARCHAR(50), DECRYPTBYPASSPHRASE('miFraseDeContraseña', @ContrasenaEncriptada));
-
-    
-    IF @ContrasenaDesencriptada = @Contrasena
-    BEGIN
-	
-        IF @CodUsuario = 'admin'
-        BEGIN
-            SELECT CodError = 0, Mensaje = 'Administrador';
-        END
-        ELSE IF EXISTS (SELECT CodUsuario FROM TDocente WHERE CodUsuario = @CodUsuario)
-        BEGIN
-            SELECT CodError = 0, Mensaje = 'Docente';
-        END
-        ELSE IF EXISTS (SELECT CodUsuario FROM TAuxiliar WHERE CodUsuario = @CodUsuario)
-        BEGIN
-            SELECT CodError = 0, Mensaje = 'Auxiliar';
-        END
-		ELSE IF EXISTS (SELECT CodUsuario FROM dbo.TAlumno WHERE CodUsuario = @CodUsuario)
-        BEGIN
-            SELECT CodError = 0, Mensaje = 'Alumno';
-        END
-        ELSE
-        BEGIN
-            SELECT CodError = 1, Mensaje = 'Error: Usuario no tiene privilegio de cliente ni docente, auxiliar, consulte al administrador';
-        END
-    END
-    ELSE
-    BEGIN
-        SELECT CodError = 1, Mensaje = 'Error: Usuario y/o contraseña incorrectos';
-    END
-END
-GO
-	
-IF OBJECT_ID('spCambiarContrasena') IS NOT NULL
-BEGIN
-    DROP PROCEDURE dbo.spCambiarContrasena;
-END
-GO
-
-CREATE PROCEDURE spCambiarContrasena
-    @CodUsuario VARCHAR(50),
-    @ContrasenaActual VARCHAR(50),
-    @NuevaContrasena VARCHAR(50)
-AS
-BEGIN
-    IF EXISTS (SELECT 1 FROM TUsuario WHERE CodUsuario = @CodUsuario AND CONVERT(VARCHAR(50), DECRYPTBYPASSPHRASE('miFraseDeContraseña', Contrasena)) = @ContrasenaActual)
-    BEGIN
-        UPDATE TUsuario
-        SET Contrasena = ENCRYPTBYPASSPHRASE('miFraseDeContraseña', @NuevaContrasena)
-        WHERE CodUsuario = @CodUsuario;
-        
-        SELECT 'Contraseña actualizada exitosamente' AS Mensaje;
-    END
-    ELSE
-    BEGIN
-        SELECT 'Error: Contraseña actual incorrecta' AS Mensaje;
-    END
-END
-GO
---******************
-SELECT A.Nombre AS Alumno, Asig.NombreAsignatura, T.Fecha, T.Estado 
-FROM TAsistencia T
-JOIN TAlumno A ON T.IdAlumno = A.IdAlumno
-JOIN TInscripcion I ON A.IdAlumno = I.IdAlumno
-JOIN TAsignatura Asig ON I.IdAsignatura = Asig.IdAsignatura
-WHERE A.Nivel = 'Primaria' AND A.CursoGrado = '1' AND T.Fecha BETWEEN '2024-09-01' AND '2024-09-30';
--------------------------------------------------------------------------
---****************este de abajo es igual solo que cosider asigantura mas
-
-SELECT 
-    A.Nombre AS Alumno, 
-    A.CursoGrado AS Grado,
-    Asig.NombreAsignatura, 
-    T.Fecha, 
-    T.Estado
-FROM 
-    TAsistencia T
-JOIN 
-    TAlumno A ON T.IdAlumno = A.IdAlumno
-JOIN 
-    TInscripcion I ON A.IdAlumno = I.IdAlumno
-JOIN 
-    TAsignatura Asig ON I.IdAsignatura = Asig.IdAsignatura
-WHERE 
-    A.Nivel = 'Primaria' 
-    AND A.CursoGrado = '1' 
-    AND T.Fecha BETWEEN '2024-09-01' AND '2024-09-30'
-    AND Asig.NombreAsignatura = 'Ciencias';  -- Reemplaza con la asignatura específica
